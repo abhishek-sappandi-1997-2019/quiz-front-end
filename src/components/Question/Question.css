@@ -1,0 +1,11 @@
+.same-row {
+    display: flex;
+    flex-wrap: wrap;
+}
+.row-right{
+    justify-content: right;
+    order: 1;
+}
+.row-left{
+    justify-self: flex-start;
+}
