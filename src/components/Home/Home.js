@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux'
-import {startGetQuiz} from '../../actions/quizAction'
+import {startGetQuiz ,startUpdateQuiz,StartDeleteQuizChoice,StartAddQuizChoice} from '../../actions/quizAction'
 import Question from '../Question/Question'
 import Grid from '@material-ui/core/Grid';
 import Choices from '../Choices/Choices'
 import ModalComponent from '../ModalComponent'
+import Button from '@material-ui/core/Button';
 
 class Home extends Component {
     constructor(){
@@ -12,51 +13,70 @@ class Home extends Component {
         this.state = {
             question : '' ,
             choices : [] ,
-            question_number : 1
+            question_number : 0 ,
+            id :''
         }
     }
     componentDidMount(){
         if(this.props.quiz.length === 0){
+            console.log('componentdidmount');
             this.props.dispatch(startGetQuiz())
         }
-        this.props.quiz.length > 0 &&
-            this.setState({ question : this.props.quiz[0].question , choices : this.props.quiz[0].choices}) 
+
     }
     handleChange = () => {
-        if(this.props.quiz.length > this.state.question_number){
+        if(this.props.quiz.length > ( 1 + this.state.question_number)){
+            console.log('increase');
             this.setState((prev)=> {
-                return {
-                    question : this.props.quiz[this.state.question_number].question ,
-                    choices : this.props.quiz[this.state.question_number].choices ,
-                    question_number : prev.question_number + 1 
-                }
+                return { question_number : prev.question_number + 1  }
             })
         }
         else {
             window.alert('end of questions')
         }
-
     }
-
+    handleUpdateQuestion = (id,obj) =>{
+        this.props.dispatch(startUpdateQuiz(id,obj))
+    }
+    handleDeleteChoices = (id ,option) => {
+        this.props.dispatch(StartDeleteQuizChoice(id,option))
+    }
+    handleAddChoices = (id,option) => {
+        this.props.dispatch(StartAddQuizChoice(id,option))
+    }
     render() {
         return (
             <div>
-                Add Question<ModalComponent/>
+                <ModalComponent/>Add Question
                 {
-                   
-                        <div>
-                        <Grid container spacing={3}>
-                        <Grid item xs={8}>
-                            <Question data={this.state.question}/>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Choices />
-                        </Grid>
-                        </Grid>
-                        <button onClick={this.handleChange}>next</button>
-                        
-                        </div>
+                    this.props.quiz.length > 0 &&(
+                    <div>
+                                            {
+                     ( this.props.quiz.length > ( 1 + this.state.question_number) )
+                     && (<Button onClick={this.handleChange} variant="contained" color="primary" size="small">next Question</Button>)
+                    }
+                    <Grid container spacing={3}>
+                    <Grid item xs={6}>
+                        <Question 
+                            data={this.props.quiz[this.state.question_number].question} 
+                            id={this.props.quiz[this.state.question_number]._id} 
+                            eventhandler={this.handleUpdateQuestion}
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Choices 
+                            data={this.props.quiz[this.state.question_number].options} 
+                            id={this.props.quiz[this.state.question_number]._id} 
+                            answer={this.props.quiz[this.state.question_number].answer}
+                            eventhandler={this.handleDeleteChoices}
+                            addeventhandler = {this.handleAddChoices}
+                        />
+                    </Grid>
+                    </Grid>
+    
                     
+                    </div>
+                   )   
                 }
             </div>
         )

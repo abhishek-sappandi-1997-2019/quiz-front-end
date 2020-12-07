@@ -9,15 +9,47 @@ class Choices extends React.Component {
     constructor(){
         super()
         this.state = {
-            value: 0
+            value: 0 ,
+            shuffle : true
         }
     }
 
   handleChange = (event, value) => {
     this.setState({ value });
   };
-
+  handleDelete = (ele) => {
+    console.log(ele);
+    const obj = { choice : ele}
+    this.props.eventhandler(this.props.id , obj)
+  }
+  handleAdd = () => {
+    const choice = window.prompt('Enter the Choice')
+    if(choice){
+      const obj = { choice }
+      this.props.addeventhandler(this.props.id , obj)
+    }
+  }
+  hanldeShuffle = () => {
+    this.setState({shuffle : true})
+  }
+  shuffle() {
+    let array = this.props.options
+    let len = array.length, temp, index;
+    // While there are elements in the array
+    while (len > 0) {
+        // Pick a random index
+        index = Math.floor(Math.random() * len);
+        // Decrease len by 1
+        len--;
+        // And swap the last element with it
+        temp = array[len];
+        array[len] = array[index];
+        array[index] = temp;
+    }
+    return array;
+}
   render() {
+
     return [
       <AppBar position="static" key="appbar">
         <Tabs 
@@ -30,24 +62,44 @@ class Choices extends React.Component {
       </AppBar>,
       <div key="tab-content">
         {this.state.value === 0 && 
-            <Typography>
-                {/* {
-                    this.props.quiz.length > 0 && this.props.quiz.options.map(option => {
-                        return (
-                            <li>{option}</li>
-                        )
-                    })
-                } */}
-            </Typography>
+          (
+            <div>
+              <button onClick={this.handleAdd}>Add Answer</button>
+              <button onClick={this.hanldeShuffle}>Shuffle</button>
+              <ol>
+                {
+                  this.shuffle().map((ele,index) => {
+                    return (
+                            <div key={index}>
+                              <li>{ele} <button onClick={() => {this.handleDelete(ele)}}>delete</button></li> <br/>
+                            </div>
+                          )
+                  })
+                }
+              </ol> 
+            </div>
+          )
         }
-        {this.state.value === 1 && <Typography>Item Two</Typography>}
+        {this.state.value === 1 && 
+          (
+            <>
+            <h2>Correct Answer :</h2>
+            {this.props.answer}
+            </>
+          )
+        }
       </div>
     ]
   }
 }
-const mapStateToProps = (state) =>{
+const mapStateToProps = (state,props) =>{
+  console.log('choices',props);
     return {
-        quiz : state.quiz
+        options : props.data,
+        eventhandler : props.eventhandler ,
+        addeventhandler : props.addeventhandler ,
+        id : props.id,
+        answer : props.answer
     }
 }
 

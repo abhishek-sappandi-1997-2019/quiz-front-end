@@ -7,12 +7,34 @@ const quizReducer = (state =[] ,action) =>{
             return [...state , action.payload]
         }
         case 'UPDATE_QUIZ':{
-            return state.map((message)=>{
-                if(message._id === action.payload._id){
-                    return {...message ,...action.payload.obj}
+            return state.map((question)=>{
+                if(question._id === action.payload._id){
+                    return {...question ,...action.payload.obj}
                 }else
                 {
-                    return {...message}
+                    return {...question}
+                }
+
+            })
+        }
+        case 'REMOVE_CHOICE':{
+            return state.map((question)=>{
+                if(question._id === action.payload._id){
+                    return {...question ,...action.payload.obj}
+                }else
+                {
+                    return {...question}
+                }
+
+            })
+        }
+        case 'ADD_CHOICE':{
+            return state.map((question)=>{
+                if(question._id === action.payload._id){
+                    return {...question ,...action.payload.obj}
+                }else
+                {
+                    return {...question}
                 }
 
             })

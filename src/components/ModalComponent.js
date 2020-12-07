@@ -63,6 +63,7 @@ function AddQuestion() {
   }
 
   function handleRemove(i) {
+    console.log('index',i);
     const values = [...fields];
     values.splice(i, 1);
     setFields(values);

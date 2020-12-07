@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux'
-import {startGetQuiz} from '../../actions/quizAction'
 import './Question.css'
 
 import ReactMde from "react-mde";
@@ -9,15 +8,14 @@ import "react-mde/lib/styles/css/react-mde-all.css";
 import EditIcon from '@material-ui/icons/Edit';
 import SaveIcon from '@material-ui/icons/Save';
 
-import {startUpdateQuiz} from '../../actions/quizAction'
-
 class Question extends Component {
     constructor(){
         super()
         this.state = {
             value:"",
             edit_question : false ,
-            tab : 'write' 
+            tab : 'write' ,
+            id : ''
         }
         this.converter = new Showdown.Converter({
             tables: true,
@@ -34,14 +32,14 @@ class Question extends Component {
         //     console.log('first');
             
         // }
-        if(this.props.quiz){
+        //if(this.props.quiz){
             this.setState({ value : this.props.quiz})
-            console.log(this.props.quiz);
-        }
+            //console.log(this.props.quiz);
+        //}
     }
     handleValueChange = (value) => {
         this.setState({ value });
-        console.log(value);
+        //console.log(value);
       };
     handleAlert = () => {
         window.alert('please click on edit to make changes')
@@ -53,13 +51,14 @@ class Question extends Component {
             }
         })
     }
-    handleSave = () => {
+    handleSave = (e) => {
         this.setState((prev) => {
             return {
                 edit_question : !prev.edit_question
             }
         })
-        this.props.dispatch(startUpdateQuiz())
+        const obj = { question : this.state.value }
+        this.props.eventhandler(this.props.id ,obj)
     }
     handleTabChange = () => {
         if(this.state.tab === 'write'){
@@ -80,10 +79,10 @@ class Question extends Component {
                    
                 </div>
                     {
-                        this.state.value.length > 0 && (
+                        this.props.quiz.length > 0 && (
                             <ReactMde
                             onChange={this.state.edit_question ? this.handleValueChange : this.handleAlert}
-                            value={this.state.value}
+                            value={this.state.edit_question ? this.state.vale : this.props.quiz}
                             selectedTab={this.state.tab}
                             onTabChange={this.handleTabChange}
                             generateMarkdownPreview={markdown =>
@@ -99,7 +98,9 @@ class Question extends Component {
 const mapStateToProps = (state,props) =>{
     console.log("data",props.data)
     return {
-        quiz : props.data
+        quiz : props.data  ,
+        eventhandler : props.eventhandler ,
+        id : props.id
     }
 }
 export default connect(mapStateToProps)(Question)
