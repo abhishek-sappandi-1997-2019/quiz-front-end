@@ -82,7 +82,9 @@ function AddQuestion() {
       options[i].isCorrect = false
     }
     const data = { question , options , answer : fields[0].value}
-    dispatch(startAddQuiz(data))
+    if(question.length > 0 && fields.length > 0){
+      dispatch(startAddQuiz(data))
+    }
     handleClose()
     setFields([{ value: null }])
   }
