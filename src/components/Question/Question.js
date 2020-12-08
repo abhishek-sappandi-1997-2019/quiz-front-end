@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux'
-import './Question.css'
-
 import ReactMde from "react-mde";
 import * as Showdown from "showdown";
-import "react-mde/lib/styles/css/react-mde-all.css";
 import EditIcon from '@material-ui/icons/Edit';
 import SaveIcon from '@material-ui/icons/Save';
+import "react-mde/lib/styles/css/react-mde-all.css";
+import '../../App.css'
 
 class Question extends Component {
     constructor(){
@@ -14,8 +13,7 @@ class Question extends Component {
         this.state = {
             value:"",
             edit_question : false ,
-            tab : 'write' ,
-            id : ''
+            tab : 'write' 
         }
         this.converter = new Showdown.Converter({
             tables: true,
@@ -24,42 +22,68 @@ class Question extends Component {
             tasklists: true
           });
     }
+
+    /**
+     * lifecycle method (assign question to state)
+     */
     componentDidMount(){
-        console.log('componet');
-        console.log(this.props.quiz);
-        // if(this.props.quiz.length == 0){
-        //     this.props.dispatch(startGetQuiz())
-        //     console.log('first');
-            
-        // }
-        //if(this.props.quiz){
-            this.setState({ value : this.props.quiz})
-            //console.log(this.props.quiz);
-        //}
+        this.setState({ value : this.props.question})
     }
+
+    /**
+     * lifecycle method to update state once props changed from parent
+     * @param {*} prevProps 
+     */
+    componentDidUpdate(prevProps){
+        if(prevProps.data !== this.props.question){
+            this.setState({ value : this.props.question })
+        }
+    }
+
+    /**
+     * this used to update state
+     * @param {*} value 
+     */
     handleValueChange = (value) => {
         this.setState({ value });
-        //console.log(value);
-      };
+    };
+
+     /**
+      * alert to change question 
+      */
     handleAlert = () => {
-        window.alert('please click on edit to make changes')
+        window.alert('please click on edit icon to make changes ...!')
     }
+
+    /**
+     * handler to edit question
+     */
     hanldeEdit = () => {
         this.setState((prev) => {
             return {
-                edit_question : !prev.edit_question
+                edit_question : !prev.edit_question ,
+                value : this.props.question
             }
         })
     }
-    handleSave = (e) => {
+
+    /**
+     * handler to save question
+     */
+    handleSave = () => {
         this.setState((prev) => {
             return {
-                edit_question : !prev.edit_question
+                edit_question : !prev.edit_question 
             }
         })
         const obj = { question : this.state.value }
-        this.props.eventhandler(this.props.id ,obj)
+        const task = "edit"
+        this.props.eventHandler(this.props.id ,obj,task)
     }
+
+    /**
+     * handler to change tab from write to preview
+     */
     handleTabChange = () => {
         if(this.state.tab === 'write'){
             this.setState({tab : 'preview'})
@@ -74,21 +98,22 @@ class Question extends Component {
                 <div className='same-row'>
                     <h1 className='row-left'>Question Stream</h1>
                     {
-                        this.state.edit_question ? <SaveIcon onClick={this.handleSave} /> : <EditIcon onClick={this.hanldeEdit} />
+                        this.state.edit_question ? 
+                        <SaveIcon className='edit-save' onClick={this.handleSave} /> : 
+                        <EditIcon  className='edit-save' onClick={this.hanldeEdit} />
                     }
-                   
                 </div>
-                    {
-                        this.props.quiz.length > 0 && (
+                    { 
+                        this.props.question.length > 0 && (
                             <ReactMde
-                            onChange={this.state.edit_question ? this.handleValueChange : this.handleAlert}
-                            value={this.state.edit_question ? this.state.vale : this.props.quiz}
-                            selectedTab={this.state.tab}
-                            onTabChange={this.handleTabChange}
-                            generateMarkdownPreview={markdown =>
-                                Promise.resolve(this.converter.makeHtml(markdown))
-                            }
-                        />
+                                onChange={this.state.edit_question ? this.handleValueChange : this.handleAlert}
+                                value={this.state.value}
+                                selectedTab={this.state.tab}
+                                onTabChange={this.handleTabChange}
+                                generateMarkdownPreview={markdown =>
+                                    Promise.resolve(this.converter.makeHtml(markdown))
+                                }
+                            />
                         )
                     }
             </div>
@@ -96,10 +121,9 @@ class Question extends Component {
     }
 }
 const mapStateToProps = (state,props) =>{
-    console.log("data",props.data)
     return {
-        quiz : props.data  ,
-        eventhandler : props.eventhandler ,
+        question : props.data ,
+        eventHandler : props.eventHandler ,
         id : props.id
     }
 }

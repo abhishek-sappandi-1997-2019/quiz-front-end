@@ -1,82 +1,89 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux'
-import {startGetQuiz ,startUpdateQuiz,StartDeleteQuizChoice,StartAddQuizChoice} from '../../actions/quizAction'
+import {startGetQuiz ,startUpdateQuiz} from '../../actions/quiz'
 import Question from '../Question/Question'
-import Grid from '@material-ui/core/Grid';
+import Grid from '@material-ui/core/Grid'
 import Choices from '../Choices/Choices'
-import ModalComponent from '../ModalComponent'
-import Button from '@material-ui/core/Button';
+import AddQuestion from '../AddQuestion/AddQuestion'
+import Button from '@material-ui/core/Button'
+
 
 class Home extends Component {
     constructor(){
         super()
         this.state = {
-            question : '' ,
-            choices : [] ,
-            question_number : 0 ,
-            id :''
+            currentQuestion : 0 
         }
     }
+    // lifecyclemethod to get the questions
     componentDidMount(){
         if(this.props.quiz.length === 0){
-            console.log('componentdidmount');
             this.props.dispatch(startGetQuiz())
         }
-
     }
+
+    // handler to change next question 
     handleChange = () => {
-        if(this.props.quiz.length > ( 1 + this.state.question_number)){
-            console.log('increase');
+        if(this.props.quiz.length - 1 > this.state.currentQuestion){ 
             this.setState((prev)=> {
-                return { question_number : prev.question_number + 1  }
+                return { currentQuestion : prev.currentQuestion + 1  }
             })
         }
         else {
             window.alert('end of questions')
         }
     }
-    handleUpdateQuestion = (id,obj) =>{
-        this.props.dispatch(startUpdateQuiz(id,obj))
+
+    // handler to update question
+    handleUpdateQuestion = (id,obj,task) =>{
+        this.props.dispatch(startUpdateQuiz(id,obj,task))
     }
+
+    // handler to remove choice
     handleDeleteChoices = (id ,option) => {
-        this.props.dispatch(StartDeleteQuizChoice(id,option))
+        this.props.dispatch(startUpdateQuiz(id,option))
     }
+
+    // handler to add choice
     handleAddChoices = (id,option) => {
-        this.props.dispatch(StartAddQuizChoice(id,option))
+        this.props.dispatch(startUpdateQuiz(id,option))
     }
     render() {
         return (
-            <div>
-                <ModalComponent/>Add Question
+            <div> 
+                <AddQuestion/><br/>
                 {
                     this.props.quiz.length > 0 &&(
-                    <div>
-                                            {
-                     ( this.props.quiz.length > ( 1 + this.state.question_number) )
-                     && (<Button onClick={this.handleChange} variant="contained" color="primary" size="small">next Question</Button>)
-                    }
-                    <Grid container spacing={3}>
-                    <Grid item xs={6}>
-                        <Question 
-                            data={this.props.quiz[this.state.question_number].question} 
-                            id={this.props.quiz[this.state.question_number]._id} 
-                            eventhandler={this.handleUpdateQuestion}
-                        />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Choices 
-                            data={this.props.quiz[this.state.question_number].options} 
-                            id={this.props.quiz[this.state.question_number]._id} 
-                            answer={this.props.quiz[this.state.question_number].answer}
-                            eventhandler={this.handleDeleteChoices}
-                            addeventhandler = {this.handleAddChoices}
-                        />
-                    </Grid>
-                    </Grid>
-    
-                    
-                    </div>
-                   )   
+                        <div> 
+                            <Button 
+                                onClick={this.handleChange} 
+                                variant="contained" 
+                                color="primary" 
+                                size="small"
+                                disabled = { !( this.props.quiz.length - 1 > this.state.currentQuestion ) }
+                            >
+                                next Question
+                            </Button>
+                                
+                            <Grid container spacing={3}>
+                                <Grid item xs={7}>
+                                    <Question 
+                                        data={this.props.quiz[this.state.currentQuestion].question} 
+                                        id={this.props.quiz[this.state.currentQuestion]._id} 
+                                        eventHandler={this.handleUpdateQuestion}
+                                    />
+                                </Grid>
+                                <Grid item xs={5}>
+                                    <Choices 
+                                        data={this.props.quiz[this.state.currentQuestion].options} 
+                                        id={this.props.quiz[this.state.currentQuestion]._id} 
+                                        answer={this.props.quiz[this.state.currentQuestion].answer}
+                                        eventHandler={this.handleUpdateQuestion}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </div>
+                    )   
                 }
             </div>
         )

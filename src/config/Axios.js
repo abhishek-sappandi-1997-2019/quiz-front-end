@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const Axios = axios.create({
-    baseURL : `http://localhost:3344/api`
+    baseURL : `https://quiz-node-backend-1.herokuapp.com/api`
 })
 
 export default Axios

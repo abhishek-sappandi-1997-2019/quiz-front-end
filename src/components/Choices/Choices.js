@@ -1,50 +1,65 @@
 import React from 'react';
-import Typography from '@material-ui/core/Typography';
 import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {connect} from 'react-redux'
+import Button from '@material-ui/core/Button';
+import DeleteIcon from '@material-ui/icons/Delete';
+import '../../App.css'
 
 class Choices extends React.Component {
     constructor(){
         super()
         this.state = {
-            value: 0 ,
-            shuffle : true
+            value: 1 ,
+            shuffle : false
         }
     }
-
+// handler to set question into state
   handleChange = (event, value) => {
     this.setState({ value });
   };
-  handleDelete = (ele) => {
-    console.log(ele);
-    const obj = { choice : ele}
-    this.props.eventhandler(this.props.id , obj)
-  }
-  handleAdd = () => {
-    const choice = window.prompt('Enter the Choice')
-    if(choice){
-      const obj = { choice }
-      this.props.addeventhandler(this.props.id , obj)
+
+// handler to remove choice
+  deleteChoice = (choice) => {
+    if(choice.isCorrect){
+      window.alert(`This is correct answer , you can't delete it....!`)
+    }
+    else{
+      const _id = choice._id
+      const obj = { choice : { _id }}
+      const task = 'remove'
+      this.props.eventHandler(this.props.id, obj ,task)
     }
   }
-  hanldeShuffle = () => {
+
+  // handler to add choice
+  addChoice = () => {
+    const value = window.prompt('Enter the Answer')
+    if(value){
+      const obj = { choice : { value ,isCorrect : false} }
+      const task = 'add'
+      this.props.eventHandler(this.props.id , obj ,task)
+    }
+  }
+
+  // handler to shuffle choice and re-render
+  handleShuffle = () => {
     this.setState({shuffle : true})
   }
-  shuffle() {
+
+  // function to shuffle choice
+  shuffleChoice() {
     let array = this.props.options
     let len = array.length, temp, index;
-    // While there are elements in the array
     while (len > 0) {
-        // Pick a random index
+
         index = Math.floor(Math.random() * len);
-        // Decrease len by 1
         len--;
-        // And swap the last element with it
         temp = array[len];
         array[len] = array[index];
         array[index] = temp;
+
     }
     return array;
 }
@@ -61,30 +76,53 @@ class Choices extends React.Component {
         </Tabs>
       </AppBar>,
       <div key="tab-content">
-        {this.state.value === 0 && 
-          (
+        {this.state.value === 0 && (
             <div>
-              <button onClick={this.handleAdd}>Add Answer</button>
-              <button onClick={this.hanldeShuffle}>Shuffle</button>
+              <br/>
+              <Button variant="outlined" color="primary" size="small" onClick={this.addChoice}><b>Add Choice</b></Button>
+              <Button variant="outlined" color="primary" size="small" onClick={this.handleShuffle}><b>Shuffle</b></Button>
               <ol>
                 {
-                  this.shuffle().map((ele,index) => {
+                  this.shuffleChoice().map((choice,index) => {
                     return (
-                            <div key={index}>
-                              <li>{ele} <button onClick={() => {this.handleDelete(ele)}}>delete</button></li> <br/>
-                            </div>
-                          )
+                      <div key={index}>
+                        <li>
+                          {choice.value}
+                          <span>
+                            <DeleteIcon 
+                              className='delete-icon' 
+                              onClick={() => {this.deleteChoice(choice)}} 
+                              color="secondary" 
+                              fontSize='small'
+                            />
+                          </span>
+                        </li><br/>
+                      </div>
+                    )
                   })
                 }
               </ol> 
             </div>
           )
         }
-        {this.state.value === 1 && 
-          (
+        {this.state.value === 1 && (
             <>
-            <h2>Correct Answer :</h2>
-            {this.props.answer}
+            <h2>Answer Key:</h2>
+            {
+              this.props.options.length > 0 && ( this.props.options.map(choice => {
+                return (
+                  <div key={choice._id}>
+                      <input 
+                          type='radio'
+                          name={choice.value}
+                          checked={choice.isCorrect}
+                          readOnly
+                        />
+                        {choice.value}
+                  </div>
+                )}) 
+              )
+            }
             </>
           )
         }
@@ -93,13 +131,10 @@ class Choices extends React.Component {
   }
 }
 const mapStateToProps = (state,props) =>{
-  console.log('choices',props);
     return {
         options : props.data,
-        eventhandler : props.eventhandler ,
-        addeventhandler : props.addeventhandler ,
-        id : props.id,
-        answer : props.answer
+        eventHandler : props.eventHandler ,
+        id : props.id
     }
 }
 

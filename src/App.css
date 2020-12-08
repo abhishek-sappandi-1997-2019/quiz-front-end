@@ -1,0 +1,19 @@
+*, html {
+    font-family: 'Noto Sans JP', sans-serif;
+    } 
+.delete-icon{
+    display: inline-flex;
+    vertical-align: middle;
+    padding-bottom: 4px;
+    margin-left: 10px;
+}
+.same-row {
+    display: flex;
+    justify-content: space-between;
+}
+.row-left{
+    justify-self: flex-start;
+}
+.edit-save{
+    padding-top: 25px;
+}

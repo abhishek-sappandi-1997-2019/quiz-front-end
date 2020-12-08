@@ -17,28 +17,6 @@ const quizReducer = (state =[] ,action) =>{
 
             })
         }
-        case 'REMOVE_CHOICE':{
-            return state.map((question)=>{
-                if(question._id === action.payload._id){
-                    return {...question ,...action.payload.obj}
-                }else
-                {
-                    return {...question}
-                }
-
-            })
-        }
-        case 'ADD_CHOICE':{
-            return state.map((question)=>{
-                if(question._id === action.payload._id){
-                    return {...question ,...action.payload.obj}
-                }else
-                {
-                    return {...question}
-                }
-
-            })
-        }
         default : {
             return [...state]
         }
